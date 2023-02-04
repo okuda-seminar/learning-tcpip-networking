@@ -1,0 +1,11 @@
+version: "3"
+services:
+  learning_tcpip_network:
+    build:
+      context: .
+    container_name: learning_tcpip_network
+    network_mode: host
+    privileged: true
+    tty: true
+    volumes:
+      - ./:/workspace/
