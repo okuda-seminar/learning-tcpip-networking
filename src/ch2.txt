@@ -8,3 +8,6 @@ sudo tcpdump -tn -i any icmp
 
 # 2.6
 traceroute -n 8.8.8.8
+
+# 2.7
+ip route show
