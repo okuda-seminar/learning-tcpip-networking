@@ -13,3 +13,29 @@ EOF
 sudo python3 -m http.server -b 127.0.0.1 80
 echo -en "GET / HTTP /1.0\r\n\r\n" | nc 127.0.0.1 80
 curl -X GET -D - http://127.0.0.1/
+
+# 6.2
+grep 127.0.0.1 /etc/hosts
+sudo tcpdump -i lo -tnlA "tcp and port 54321"
+dig +short @8.8.8.8 example.org A
+
+# 6.3
+sudo ip --all netns delete
+
+sudo ip netns add server
+sudo ip netns add client
+
+sudo ip link add s-veth0 type veth peer name c-veth0
+
+sudo ip link set s-veth0 netns server
+sudo ip link set c-veth0 netns client
+
+sudo ip netns exec server ip link set s-veth0 up
+sudo ip netns exec client ip link set c-veth0 up
+sudo ip netns exec server ip address add 192.0.2.254/24 dev s-veth0
+
+sudo ip netns exec server dnsmasq --dhcp-range=192.0.2.100,192.0.2.200,255.255.255.0 --interface=s-veth0 --port 0 --no-resolv --no-daemon
+
+sudo ip netns exec client dhclient -d c-veth0
+sudo ip netns exec client ip address show | grep "inet "
+sudo ip netns exec client ip route show
